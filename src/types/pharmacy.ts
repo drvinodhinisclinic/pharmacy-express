@@ -1,21 +1,24 @@
 export interface Product {
-  ProductID: number;
-  HSNCode: string;
-  MFR: string;
+  ProductID?: number;
+  HSNCode?: string;
+  MFR?: string;
   ProductName: string;
-  PackOf: number;
+  PackOf?: number;
   MRP: string;
   unitPrice: string;
-  Size: string;
+  Size?: string;
   Drug: string;
+  Batch: string;
+  Exp: string;
+  QtyInStock?: number;
   IsActive?: number;
   CreatedAt?: string;
   UpdatedAt?: string;
 }
 
 export interface CartItem extends Product {
+  cartId: string; // Unique identifier for cart row (ProductName + Batch)
   quantity: number;
-  batch: string;
   expiryDate: string;
   salePrice: number;
 }
