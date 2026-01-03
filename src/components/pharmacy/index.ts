@@ -4,3 +4,4 @@ export { CartRow } from './CartRow';
 export { CartTable } from './CartTable';
 export { BillingSummary } from './BillingSummary';
 export { ConfirmationModal } from './ConfirmationModal';
+export { PatientSearch } from './PatientSearch';

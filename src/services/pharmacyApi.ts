@@ -1,6 +1,22 @@
-import { Product } from '@/types/pharmacy';
+import { Product, Patient } from '@/types/pharmacy';
 
 const API_BASE = 'http://localhost:3000/api/pharma';
+const PATIENTS_API_BASE = 'http://localhost:3000/api/patients';
+
+export async function searchPatients(query: string): Promise<Patient[]> {
+  if (query.length < 2) return [];
+  
+  try {
+    const response = await fetch(`${PATIENTS_API_BASE}/search?q=${encodeURIComponent(query)}`);
+    if (!response.ok) {
+      throw new Error('Patient search failed');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Patient search error:', error);
+    throw error;
+  }
+}
 
 export async function searchProducts(query: string): Promise<Product[]> {
   if (query.length < 2) return [];
@@ -18,8 +34,13 @@ export async function searchProducts(query: string): Promise<Product[]> {
 }
 
 export async function processBill(payload: {
+  patient: {
+    Patient_id: number;
+    Name: string;
+    Mobile: string;
+  } | null;
   items: {
-    ProductID: number;
+    ProductID?: number;
     ProductName: string;
     Drug: string;
     Quantity: number;
