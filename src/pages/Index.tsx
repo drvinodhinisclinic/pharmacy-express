@@ -67,11 +67,21 @@ function Index() {
   
   // Add product to cart
   const addToCart = useCallback((product: Product) => {
+    // Create unique cart ID from ProductName + Batch
+    const cartId = `${product.ProductName.trim()}_${product.Batch}`;
+    
+    // Format expiry date from ISO string
+    const formatExpiry = (exp: string) => {
+      if (!exp) return '';
+      const date = new Date(exp);
+      return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+    };
+    
     setCartItems((prev) => {
-      const existingIndex = prev.findIndex((item) => item.ProductID === product.ProductID);
+      const existingIndex = prev.findIndex((item) => item.cartId === cartId);
       
       if (existingIndex >= 0) {
-        // Increase quantity if already in cart
+        // Increase quantity if same product+batch already in cart
         const updated = [...prev];
         updated[existingIndex] = {
           ...updated[existingIndex],
@@ -80,12 +90,12 @@ function Index() {
         return updated;
       }
       
-      // Add new item
+      // Add new item with batch and expiry from API
       const newItem: CartItem = {
         ...product,
+        cartId,
         quantity: 1,
-        batch: '',
-        expiryDate: '',
+        expiryDate: formatExpiry(product.Exp),
         salePrice: parseFloat(product.unitPrice),
       };
       return [...prev, newItem];
@@ -101,7 +111,7 @@ function Index() {
     
     toast({
       title: 'Added to cart',
-      description: `${product.ProductName} added successfully`,
+      description: `${product.ProductName} (Batch: ${product.Batch}) added`,
     });
   }, []);
   
@@ -131,40 +141,40 @@ function Index() {
   }, [showResults, searchResults, selectedIndex, addToCart]);
   
   // Cart operations
-  const updateQuantity = useCallback((productId: number, quantity: number) => {
+  const updateQuantity = useCallback((cartId: string, quantity: number) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.ProductID === productId ? { ...item, quantity } : item
+        item.cartId === cartId ? { ...item, quantity } : item
       )
     );
   }, []);
   
-  const updateSalePrice = useCallback((productId: number, salePrice: number) => {
+  const updateSalePrice = useCallback((cartId: string, salePrice: number) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.ProductID === productId ? { ...item, salePrice } : item
+        item.cartId === cartId ? { ...item, salePrice } : item
       )
     );
   }, []);
   
-  const updateBatch = useCallback((productId: number, batch: string) => {
+  const updateBatch = useCallback((cartId: string, batch: string) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.ProductID === productId ? { ...item, batch } : item
+        item.cartId === cartId ? { ...item, Batch: batch } : item
       )
     );
   }, []);
   
-  const updateExpiry = useCallback((productId: number, expiryDate: string) => {
+  const updateExpiry = useCallback((cartId: string, expiryDate: string) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.ProductID === productId ? { ...item, expiryDate } : item
+        item.cartId === cartId ? { ...item, expiryDate } : item
       )
     );
   }, []);
   
-  const removeItem = useCallback((productId: number) => {
-    setCartItems((prev) => prev.filter((item) => item.ProductID !== productId));
+  const removeItem = useCallback((cartId: string) => {
+    setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
   }, []);
   
   // Calculate totals
@@ -192,7 +202,7 @@ function Index() {
           Quantity: item.quantity,
           MRP: parseFloat(item.MRP),
           SalePrice: item.salePrice,
-          Batch: item.batch,
+          Batch: item.Batch,
           ExpiryDate: item.expiryDate,
         })),
         totalItems,

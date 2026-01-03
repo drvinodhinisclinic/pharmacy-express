@@ -4,11 +4,11 @@ import { ShoppingCart } from 'lucide-react';
 
 interface CartTableProps {
   items: CartItem[];
-  onQuantityChange: (productId: number, quantity: number) => void;
-  onSalePriceChange: (productId: number, salePrice: number) => void;
-  onBatchChange: (productId: number, batch: string) => void;
-  onExpiryChange: (productId: number, expiry: string) => void;
-  onRemove: (productId: number) => void;
+  onQuantityChange: (cartId: string, quantity: number) => void;
+  onSalePriceChange: (cartId: string, salePrice: number) => void;
+  onBatchChange: (cartId: string, batch: string) => void;
+  onExpiryChange: (cartId: string, expiry: string) => void;
+  onRemove: (cartId: string) => void;
 }
 
 export function CartTable({
@@ -48,7 +48,7 @@ export function CartTable({
         <tbody>
           {items.map((item) => (
             <CartRow
-              key={item.ProductID}
+              key={item.cartId}
               item={item}
               onQuantityChange={onQuantityChange}
               onSalePriceChange={onSalePriceChange}
