@@ -58,7 +58,7 @@ export function PatientSearch({ selectedPatient, onPatientSelect }: PatientSearc
     setShowResults(false);
     toast({
       title: 'Patient Selected',
-      description: `${patient.Name} selected`,
+      description: `${patient.name} selected`,
     });
   };
   
@@ -126,7 +126,7 @@ export function PatientSearch({ selectedPatient, onPatientSelect }: PatientSearc
             ) : (
               searchResults.map((patient, index) => (
                 <button
-                  key={patient.Patient_id}
+                  key={patient.patient_id}
                   onClick={() => handleSelect(patient)}
                   className={`w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-accent/50 transition-colors ${
                     index === selectedIndex ? 'bg-accent/50' : ''
@@ -136,9 +136,9 @@ export function PatientSearch({ selectedPatient, onPatientSelect }: PatientSearc
                     <User className="h-4 w-4 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground truncate">{patient.Name}</p>
+                    <p className="font-medium text-foreground truncate">{patient.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {patient.Age}Y / {patient.Gender} • {patient.Mobile}
+                      {patient.age}Y / {patient.gender} • {patient.mobile}
                     </p>
                   </div>
                 </button>
@@ -159,19 +159,19 @@ export function PatientSearch({ selectedPatient, onPatientSelect }: PatientSearc
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">Patient Name</p>
-                  <p className="font-semibold text-foreground">{selectedPatient.Name}</p>
+                  <p className="font-semibold text-foreground">{selectedPatient.name}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">Age</p>
-                  <p className="font-semibold text-foreground">{selectedPatient.Age} years</p>
+                  <p className="font-semibold text-foreground">{selectedPatient.age} years</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">Gender</p>
-                  <p className="font-semibold text-foreground">{selectedPatient.Gender}</p>
+                  <p className="font-semibold text-foreground">{selectedPatient.gender}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">Mobile</p>
-                  <p className="font-semibold text-foreground">{selectedPatient.Mobile}</p>
+                  <p className="font-semibold text-foreground">{selectedPatient.mobile}</p>
                 </div>
               </div>
             </div>

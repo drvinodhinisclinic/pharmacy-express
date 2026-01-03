@@ -35,9 +35,9 @@ export async function searchProducts(query: string): Promise<Product[]> {
 
 export async function processBill(payload: {
   patient: {
-    Patient_id: number;
-    Name: string;
-    Mobile: string;
+    patient_id: number;
+    name: string;
+    mobile: string;
   } | null;
   items: {
     ProductID?: number;
