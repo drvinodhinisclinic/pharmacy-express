@@ -200,9 +200,9 @@ function Index() {
     try {
       const payload = {
         patient: selectedPatient ? {
-          Patient_id: selectedPatient.Patient_id,
-          Name: selectedPatient.Name,
-          Mobile: selectedPatient.Mobile,
+          patient_id: selectedPatient.patient_id,
+          name: selectedPatient.name,
+          mobile: selectedPatient.mobile,
         } : null,
         items: cartItems.map((item) => ({
           ProductID: item.ProductID,

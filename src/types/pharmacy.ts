@@ -1,9 +1,9 @@
 export interface Patient {
-  Patient_id: number;
-  Name: string;
-  Age: number;
-  Gender: string;
-  Mobile: string;
+  patient_id: number;
+  name: string;
+  age: string;
+  gender: string;
+  mobile: string;
 }
 
 export interface Product {
