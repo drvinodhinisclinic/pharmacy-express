@@ -1,3 +1,11 @@
+export interface Patient {
+  Patient_id: number;
+  Name: string;
+  Age: number;
+  Gender: string;
+  Mobile: string;
+}
+
 export interface Product {
   ProductID?: number;
   HSNCode?: string;

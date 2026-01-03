@@ -4,11 +4,12 @@ import {
   SearchResults, 
   CartTable, 
   BillingSummary, 
-  ConfirmationModal 
+  ConfirmationModal,
+  PatientSearch
 } from '@/components/pharmacy';
 import { useDebounce, useClickOutside } from '@/hooks/useDebounce';
 import { searchProducts, processBill } from '@/services/pharmacyApi';
-import { Product, CartItem } from '@/types/pharmacy';
+import { Product, CartItem, Patient } from '@/types/pharmacy';
 import { toast } from '@/hooks/use-toast';
 import { Pill } from 'lucide-react';
 
@@ -19,6 +20,9 @@ function Index() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  
+  // Patient state
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   
   // Cart state
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -195,6 +199,11 @@ function Index() {
     
     try {
       const payload = {
+        patient: selectedPatient ? {
+          Patient_id: selectedPatient.Patient_id,
+          Name: selectedPatient.Name,
+          Mobile: selectedPatient.Mobile,
+        } : null,
         items: cartItems.map((item) => ({
           ProductID: item.ProductID,
           ProductName: item.ProductName,
@@ -231,7 +240,7 @@ function Index() {
     } finally {
       setIsProcessing(false);
     }
-  }, [cartItems, totalItems, totalAmount]);
+  }, [cartItems, totalItems, totalAmount, selectedPatient]);
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -251,8 +260,18 @@ function Index() {
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 pb-32">
         <div className="max-w-7xl mx-auto space-y-6">
-          {/* Search Section */}
+          {/* Patient Search Section */}
           <section>
+            <h2 className="text-lg font-semibold text-foreground mb-3">Patient Details</h2>
+            <PatientSearch
+              selectedPatient={selectedPatient}
+              onPatientSelect={setSelectedPatient}
+            />
+          </section>
+          
+          {/* Medicine Search Section */}
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-3">Search Medicine</h2>
             <div 
               ref={searchContainerRef}
               className="relative max-w-2xl"
