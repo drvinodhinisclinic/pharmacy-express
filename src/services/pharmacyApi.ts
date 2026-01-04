@@ -8,7 +8,7 @@ export async function searchPatients(query: string): Promise<Patient[]> {
   if (query.length < 2) return [];
   
   try {
-    const response = await fetch(`${PATIENTS_API_BASE}/search?q=${encodeURIComponent(query)}`);
+    const response = await fetch(`${PATIENTS_API_BASE}/search?q=${encodeURIComponent(query)}`,{headers: {'ngrok-skip-browser-warning': 'true'}});
     if (!response.ok) {
       throw new Error('Patient search failed');
     }
@@ -23,7 +23,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
   if (query.length < 2) return [];
   
   try {
-    const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+    const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`,{headers: {'ngrok-skip-browser-warning': 'true'}});
     if (!response.ok) {
       throw new Error('Search failed');
     }
@@ -59,6 +59,7 @@ export async function processBill(payload: {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
       },
       body: JSON.stringify(payload),
     });
