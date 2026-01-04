@@ -1,9 +1,9 @@
 import { Product, Patient } from '@/types/pharmacy';
 
-//const API_BASE = 'http://localhost:3000/api/pharma';
-//const PATIENTS_API_BASE = 'http://localhost:3000/api/patients';
-const API_BASE = 'http://192.168.1.33:3000/api/pharma';
-const PATIENTS_API_BASE = 'http://192.168.1.33:3000/api/patients';
+const API_BASE = 'http://localhost:3000/api/pharma';
+const PATIENTS_API_BASE = 'http://localhost:3000/api/patients';
+//const API_BASE = 'http://192.168.1.33:3000/api/pharma';
+//const PATIENTS_API_BASE = 'http://192.168.1.33:3000/api/patients';
 //const API_BASE = 'https://unsimplified-gwendolyn-reasonable.ngrok-free.dev/api/pharma';
 //const PATIENTS_API_BASE = 'https://unsimplified-gwendolyn-reasonable.ngrok-free.dev/api/patients';
 export async function searchPatients(query: string): Promise<Patient[]> {
