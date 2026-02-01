@@ -21,11 +21,14 @@ export async function searchPatients(query: string): Promise<Patient[]> {
   }
 }
 
-export async function searchProducts(query: string): Promise<Product[]> {
+export async function searchProducts(query: string, locationId: number): Promise<Product[]> {
   if (query.length < 2) return [];
   
   try {
-    const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`,{headers: {'ngrok-skip-browser-warning': 'true'}});
+    const response = await fetch(
+      `${API_BASE}/search?q=${encodeURIComponent(query)}&locationId=${locationId}`,
+      { headers: { 'ngrok-skip-browser-warning': 'true' } }
+    );
     if (!response.ok) {
       throw new Error('Search failed');
     }
@@ -37,6 +40,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
 }
 
 export async function processBill(payload: {
+  locationId: number;
   patient: {
     patient_id: number;
     name: string;
