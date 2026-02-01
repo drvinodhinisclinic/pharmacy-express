@@ -48,7 +48,7 @@ export function LocationSelector({
       setError(null);
       try {
         const response = await fetch(
-          'http://192.168.0.103:3000/api/productmgmt/locations',
+          'http://localhost:3000/api/productmgmt/locations',
           { headers: { 'ngrok-skip-browser-warning': 'true' } }
         );
         if (!response.ok) {
