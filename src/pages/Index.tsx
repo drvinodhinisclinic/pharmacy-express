@@ -5,8 +5,10 @@ import {
   CartTable, 
   BillingSummary, 
   ConfirmationModal,
-  PatientSearch
+  PatientSearch,
+  LocationSelector,
 } from '@/components/pharmacy';
+import type { Location } from '@/components/pharmacy';
 import { useDebounce, useClickOutside } from '@/hooks/useDebounce';
 import { searchProducts, processBill } from '@/services/pharmacyApi';
 import { Product, CartItem, Patient } from '@/types/pharmacy';
@@ -23,6 +25,9 @@ function Index() {
   
   // Patient state
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  
+  // Location state
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   
   // Cart state
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -49,9 +54,20 @@ function Index() {
         return;
       }
       
+      // Block search if no location selected
+      if (!selectedLocation) {
+        toast({
+          title: 'Location Required',
+          description: 'Please select a location before searching.',
+          variant: 'destructive',
+        });
+        setSearchResults([]);
+        return;
+      }
+      
       setIsSearching(true);
       try {
-        const results = await searchProducts(debouncedQuery);
+        const results = await searchProducts(debouncedQuery, selectedLocation.LocationID);
         setSearchResults(results);
         setSelectedIndex(0);
       } catch (error) {
@@ -67,7 +83,7 @@ function Index() {
     };
     
     fetchResults();
-  }, [debouncedQuery]);
+  }, [debouncedQuery, selectedLocation]);
   
   // Add product to cart
   const addToCart = useCallback((product: Product) => {
@@ -181,6 +197,14 @@ function Index() {
     setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
   }, []);
   
+  // Handle location change when cart has items
+  const handleLocationChangeConfirm = useCallback(() => {
+    setCartItems([]);
+  }, []);
+  
+  // Check if location is locked (cart has items)
+  const isLocationLocked = cartItems.length > 0;
+  
   // Calculate totals
   const { totalItems, totalAmount } = useMemo(() => {
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -194,11 +218,21 @@ function Index() {
   }, []);
   
   const confirmBill = useCallback(async () => {
+    if (!selectedLocation) {
+      toast({
+        title: 'Location Required',
+        description: 'Please select a location before billing.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     setShowConfirmModal(false);
     setIsProcessing(true);
     
     try {
       const payload = {
+        locationId: selectedLocation.LocationID,
         patient: selectedPatient ? {
           patient_id: selectedPatient.patient_id,
           name: selectedPatient.name,
@@ -240,7 +274,7 @@ function Index() {
     } finally {
       setIsProcessing(false);
     }
-  }, [cartItems, totalItems, totalAmount, selectedPatient]);
+  }, [cartItems, totalItems, totalAmount, selectedPatient, selectedLocation]);
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -269,6 +303,17 @@ function Index() {
             />
           </section>
           
+          {/* Location Selector Section */}
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-3">Select Location *</h2>
+            <LocationSelector
+              selectedLocation={selectedLocation}
+              onLocationSelect={setSelectedLocation}
+              isLocked={isLocationLocked}
+              onConfirmChange={handleLocationChangeConfirm}
+            />
+          </section>
+          
           {/* Medicine Search Section */}
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-3">Search Medicine</h2>
@@ -280,6 +325,14 @@ function Index() {
               <SearchBar
                 value={searchQuery}
                 onChange={(value) => {
+                  if (!selectedLocation) {
+                    toast({
+                      title: 'Location Required',
+                      description: 'Please select a location before searching.',
+                      variant: 'destructive',
+                    });
+                    return;
+                  }
                   setSearchQuery(value);
                   setShowResults(true);
                 }}
