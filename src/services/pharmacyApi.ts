@@ -47,7 +47,7 @@ export async function processBill(payload: {
     mobile: string;
   } | null;
   items: {
-    ProductID?: number;
+    ProductID: number;
     ProductName: string;
     Drug: string;
     Quantity: number;
