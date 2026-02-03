@@ -246,7 +246,7 @@ function Index() {
           mobile: selectedPatient.mobile,
         } : null,
         items: cartItems.map((item) => ({
-          ProductID: item.ProductID,
+          ProductID: item.Productid || item.ProductID,
           ProductName: item.ProductName,
           Drug: item.Drug,
           Quantity: item.quantity,

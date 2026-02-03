@@ -7,7 +7,8 @@ export interface Patient {
 }
 
 export interface Product {
-  ProductID?: number;
+  Productid?: number;  // API returns lowercase 'id'
+  ProductID?: number;  // Alias for compatibility
   HSNCode?: string;
   MFR?: string;
   ProductName: string;
