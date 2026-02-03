@@ -7,8 +7,9 @@ import {
   ConfirmationModal,
   PatientSearch,
   LocationSelector,
+  DoctorSelector,
 } from '@/components/pharmacy';
-import type { Location } from '@/components/pharmacy';
+import type { Location, Doctor } from '@/components/pharmacy';
 import { useDebounce, useClickOutside } from '@/hooks/useDebounce';
 import { searchProducts, processBill } from '@/services/pharmacyApi';
 import { Product, CartItem, Patient } from '@/types/pharmacy';
@@ -28,6 +29,9 @@ function Index() {
   
   // Location state
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  
+  // Doctor state
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   
   // Cart state
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -233,6 +237,10 @@ function Index() {
     try {
       const payload = {
         locationId: selectedLocation.LocationID,
+        doctor: selectedDoctor ? {
+          id: selectedDoctor.id,
+          name: selectedDoctor.name,
+        } : null,
         patient: selectedPatient ? {
           patient_id: selectedPatient.patient_id,
           name: selectedPatient.name,
@@ -274,7 +282,7 @@ function Index() {
     } finally {
       setIsProcessing(false);
     }
-  }, [cartItems, totalItems, totalAmount, selectedPatient, selectedLocation]);
+  }, [cartItems, totalItems, totalAmount, selectedPatient, selectedLocation, selectedDoctor]);
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -311,6 +319,15 @@ function Index() {
               onLocationSelect={setSelectedLocation}
               isLocked={isLocationLocked}
               onConfirmChange={handleLocationChangeConfirm}
+            />
+          </section>
+          
+          {/* Doctor Selector Section */}
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-3">Consulting Doctor</h2>
+            <DoctorSelector
+              selectedDoctor={selectedDoctor}
+              onDoctorSelect={setSelectedDoctor}
             />
           </section>
           
