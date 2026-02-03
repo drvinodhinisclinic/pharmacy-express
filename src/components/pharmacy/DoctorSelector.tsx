@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/select';
 
 export interface Doctor {
-  id: number;
   name: string;
 }
 
@@ -39,8 +38,8 @@ export function DoctorSelector({
           throw new Error('Failed to fetch doctors');
         }
         const result = await response.json();
-        // Handle both array response and { data: [] } response
-        const doctorData: Doctor[] = Array.isArray(result) ? result : (result.data || []);
+        // Handle API response: { success: true, doctors: [...] }
+        const doctorData: Doctor[] = result.doctors || result.data || (Array.isArray(result) ? result : []);
         
         if (doctorData.length === 0) {
           setError('No doctors available');
@@ -67,7 +66,7 @@ export function DoctorSelector({
   }, []);
 
   const handleValueChange = (value: string) => {
-    const doctor = doctors.find((d) => d.id.toString() === value);
+    const doctor = doctors.find((d) => d.name === value);
     onDoctorSelect(doctor || null);
   };
 
@@ -95,17 +94,17 @@ export function DoctorSelector({
         <Stethoscope className="h-5 w-5 text-primary" />
       </div>
       <Select
-        value={selectedDoctor?.id.toString() || ''}
+        value={selectedDoctor?.name || ''}
         onValueChange={handleValueChange}
       >
         <SelectTrigger className="w-full max-w-md">
           <SelectValue placeholder="Select Consulting Doctor" />
         </SelectTrigger>
         <SelectContent className="bg-popover border border-border shadow-lg z-50">
-          {doctors.map((doctor) => (
+          {doctors.map((doctor, index) => (
             <SelectItem
-              key={doctor.id}
-              value={doctor.id.toString()}
+              key={index}
+              value={doctor.name}
               className="cursor-pointer"
             >
               {doctor.name}

@@ -238,7 +238,6 @@ function Index() {
       const payload = {
         locationId: selectedLocation.LocationID,
         doctor: selectedDoctor ? {
-          id: selectedDoctor.id,
           name: selectedDoctor.name,
         } : null,
         patient: selectedPatient ? {
