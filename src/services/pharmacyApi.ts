@@ -42,7 +42,6 @@ export async function searchProducts(query: string, locationId: number): Promise
 export async function processBill(payload: {
   locationId: number;
   doctor: {
-    id: number;
     name: string;
   } | null;
   patient: {
