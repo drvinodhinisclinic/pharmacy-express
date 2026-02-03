@@ -6,4 +6,6 @@ export { BillingSummary } from './BillingSummary';
 export { ConfirmationModal } from './ConfirmationModal';
 export { PatientSearch } from './PatientSearch';
 export { LocationSelector } from './LocationSelector';
+export { DoctorSelector } from './DoctorSelector';
 export type { Location } from './LocationSelector';
+export type { Doctor } from './DoctorSelector';
