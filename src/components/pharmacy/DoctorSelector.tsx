@@ -31,7 +31,7 @@ export function DoctorSelector({
       setError(null);
       try {
         const response = await fetch(
-          'http://localhost:3000/api/doctors',
+          'http://192.168.0.104:3000/api/doctors',
           { headers: { 'ngrok-skip-browser-warning': 'true' } }
         );
         if (!response.ok) {
