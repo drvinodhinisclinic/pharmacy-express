@@ -49,7 +49,7 @@ export function BillingSummary({ items, onProcessBill, isProcessing }: BillingSu
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Grand Total</p>
-                <p className="text-2xl font-bold text-success">₹{subtotal.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-success">₹{Math.round(subtotal)}</p>
               </div>
             </div>
           </div>
