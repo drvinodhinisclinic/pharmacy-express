@@ -45,7 +45,7 @@ export function ConfirmationModal({
               </li>
               <li className="flex justify-between">
                 <span className="text-muted-foreground">Grand Total:</span>
-                <span className="font-bold text-primary">₹{totalAmount.toFixed(2)}</span>
+                <span className="font-bold text-primary">₹{Math.round(totalAmount)}</span>
               </li>
             </ul>
             <p className="mt-4 text-sm text-muted-foreground">
