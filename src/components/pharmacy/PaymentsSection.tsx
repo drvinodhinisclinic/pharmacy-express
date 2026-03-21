@@ -20,7 +20,7 @@ export function PaymentsSection({ totalAmount, onPaymentChange }: PaymentsSectio
   const cash = parseFloat(cashStr) || 0;
   const upi = parseFloat(upiStr) || 0;
   const sum = Math.round((cash + upi) * 100) / 100;
-  const roundedTotal = Math.round(totalAmount * 100) / 100;
+  const roundedTotal = Math.round(totalAmount);
   const differenceAmount = Math.round(roundedTotal - sum);
 
   useEffect(() => {
