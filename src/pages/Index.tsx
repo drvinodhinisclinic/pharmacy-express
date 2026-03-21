@@ -8,10 +8,12 @@ import {
   PatientSearch,
   LocationSelector,
   DoctorSelector,
+  PaymentsSection,
+  PrescriptionUpload,
 } from '@/components/pharmacy';
-import type { Location, Doctor } from '@/components/pharmacy';
+import type { Location, Doctor, PaymentDetails } from '@/components/pharmacy';
 import { useDebounce, useClickOutside } from '@/hooks/useDebounce';
-import { searchProducts, processBill } from '@/services/pharmacyApi';
+import { searchProducts, processBill, uploadPrescription } from '@/services/pharmacyApi';
 import { Product, CartItem, Patient } from '@/types/pharmacy';
 import { toast } from '@/hooks/use-toast';
 import { Pill } from 'lucide-react';
@@ -36,6 +38,13 @@ function Index() {
   // Cart state
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   
+  // Payment state
+  const [payment, setPayment] = useState<PaymentDetails>({ cash: 0, upi: 0 });
+  const [isPaymentValid, setIsPaymentValid] = useState(false);
+
+  // Prescription state
+  const [prescriptionFiles, setPrescriptionFiles] = useState<File[]>([]);
+  
   // Modal state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -58,7 +67,6 @@ function Index() {
         return;
       }
       
-      // Block search if no location selected
       if (!selectedLocation) {
         toast({
           title: 'Location Required',
@@ -91,21 +99,18 @@ function Index() {
   
   // Add product to cart
   const addToCart = useCallback((product: Product) => {
-    // Create unique cart ID from ProductName + Batch
     const cartId = `${product.ProductName.trim()}_${product.Batch}`;
     
-    // Format expiry date from ISO string
     const formatExpiry = (exp: string) => {
       if (!exp) return '';
       const date = new Date(exp);
-      return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+      return date.toISOString().split('T')[0];
     };
     
     setCartItems((prev) => {
       const existingIndex = prev.findIndex((item) => item.cartId === cartId);
       
       if (existingIndex >= 0) {
-        // Increase quantity if same product+batch already in cart
         const updated = [...prev];
         updated[existingIndex] = {
           ...updated[existingIndex],
@@ -114,7 +119,6 @@ function Index() {
         return updated;
       }
       
-      // Add new item with batch and expiry from API
       const newItem: CartItem = {
         ...product,
         cartId,
@@ -125,12 +129,10 @@ function Index() {
       return [...prev, newItem];
     });
     
-    // Reset search
     setSearchQuery('');
     setSearchResults([]);
     setShowResults(false);
     
-    // Refocus search input
     setTimeout(() => searchInputRef.current?.focus(), 100);
     
     toast({
@@ -201,12 +203,10 @@ function Index() {
     setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
   }, []);
   
-  // Handle location change when cart has items
   const handleLocationChangeConfirm = useCallback(() => {
     setCartItems([]);
   }, []);
   
-  // Check if location is locked (cart has items)
   const isLocationLocked = cartItems.length > 0;
   
   // Calculate totals
@@ -215,11 +215,25 @@ function Index() {
     const totalAmount = cartItems.reduce((sum, item) => sum + item.quantity * item.salePrice, 0);
     return { totalItems, totalAmount };
   }, [cartItems]);
+
+  // Payment handler
+  const handlePaymentChange = useCallback((p: PaymentDetails, valid: boolean) => {
+    setPayment(p);
+    setIsPaymentValid(valid);
+  }, []);
   
   // Process bill
   const handleProcessBill = useCallback(() => {
+    if (!isPaymentValid) {
+      toast({
+        title: 'Payment Required',
+        description: 'Please enter valid payment details matching the bill total.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setShowConfirmModal(true);
-  }, []);
+  }, [isPaymentValid]);
   
   const confirmBill = useCallback(async () => {
     if (!selectedLocation) {
@@ -255,6 +269,10 @@ function Index() {
           Batch: item.Batch,
           ExpiryDate: item.expiryDate,
         })),
+        payments: {
+          cash: payment.cash,
+          upi: payment.upi,
+        },
         totalItems,
         totalAmount,
         billedAt: new Date().toISOString(),
@@ -266,11 +284,36 @@ function Index() {
         title: 'Bill Processed',
         description: `Bill of ₹${totalAmount.toFixed(2)} processed successfully!`,
       });
+
+      // Upload prescription images if present (non-blocking)
+      if (prescriptionFiles.length > 0 && selectedPatient) {
+        try {
+          await uploadPrescription(
+            selectedPatient.name,
+            selectedPatient.patient_id,
+            selectedPatient.mobile,
+            prescriptionFiles
+          );
+          toast({
+            title: 'Prescription Uploaded',
+            description: 'Prescription images uploaded successfully.',
+          });
+        } catch {
+          console.error('Prescription upload failed after billing');
+          toast({
+            title: 'Prescription Upload Warning',
+            description: 'Bill processed but prescription upload failed. Please retry manually.',
+            variant: 'destructive',
+          });
+        }
+      }
       
-      // Clear cart
+      // Clear cart and payment state
       setCartItems([]);
+      setPayment({ cash: 0, upi: 0 });
+      setIsPaymentValid(false);
+      setPrescriptionFiles([]);
       
-      // Refocus search
       setTimeout(() => searchInputRef.current?.focus(), 100);
     } catch (error) {
       toast({
@@ -281,7 +324,7 @@ function Index() {
     } finally {
       setIsProcessing(false);
     }
-  }, [cartItems, totalItems, totalAmount, selectedPatient, selectedLocation, selectedDoctor]);
+  }, [cartItems, totalItems, totalAmount, selectedPatient, selectedLocation, selectedDoctor, payment, prescriptionFiles]);
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -383,6 +426,30 @@ function Index() {
               onExpiryChange={updateExpiry}
               onRemove={removeItem}
             />
+          </section>
+
+          {/* Payments Section */}
+          {cartItems.length > 0 && (
+            <section>
+              <h2 className="text-lg font-semibold text-foreground mb-3">Payments</h2>
+              <div className="bg-card border border-border rounded-lg p-4">
+                <PaymentsSection
+                  totalAmount={totalAmount}
+                  onPaymentChange={handlePaymentChange}
+                />
+              </div>
+            </section>
+          )}
+
+          {/* Prescription Upload Section */}
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-3">Prescription Upload</h2>
+            <div className="bg-card border border-border rounded-lg p-4">
+              <PrescriptionUpload
+                files={prescriptionFiles}
+                onFilesChange={setPrescriptionFiles}
+              />
+            </div>
           </section>
         </div>
       </main>
