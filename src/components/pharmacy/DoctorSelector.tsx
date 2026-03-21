@@ -32,8 +32,8 @@ export function DoctorSelector({
       setError(null);
       try {
         const response = await fetch(
-          'https://192.168.0.104:3000/api/doctors',
-          { headers: { 'ngrok-skip-browser-warning': 'true' } }
+          getUrl('doctors'),
+          { headers: config.headers }
         );
         if (!response.ok) {
           throw new Error('Failed to fetch doctors');
