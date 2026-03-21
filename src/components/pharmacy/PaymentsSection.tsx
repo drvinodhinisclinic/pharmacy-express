@@ -21,6 +21,7 @@ export function PaymentsSection({ totalAmount, onPaymentChange }: PaymentsSectio
   const upi = parseFloat(upiStr) || 0;
   const sum = Math.round((cash + upi) * 100) / 100;
   const roundedTotal = Math.round(totalAmount * 100) / 100;
+  const differenceAmount = Math.round(roundedTotal - sum);
 
   useEffect(() => {
     if (totalAmount === 0) {
@@ -36,7 +37,7 @@ export function PaymentsSection({ totalAmount, onPaymentChange }: PaymentsSectio
     }
 
     if (sum !== roundedTotal) {
-      setError(`Payment total (₹${sum.toFixed(2)}) doesn't match bill (₹${roundedTotal.toFixed(2)})`);
+      setError(`Payment total (₹${sum.toFixed(2)}) doesn't match bill (₹${roundedTotal.toFixed(2)}). ADD (₹${differenceAmount.toFixed(2)})`);
       onPaymentChange({ cash, upi }, false);
       return;
     }
