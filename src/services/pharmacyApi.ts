@@ -1,16 +1,14 @@
 import { Product, Patient } from '@/types/pharmacy';
+import config, { getUrl } from '@/config/api';
 
-const API_BASE = 'https://192.168.0.104:3000/api/pharma';
-const PATIENTS_API_BASE = 'https://192.168.0.104:3000/api/patients';
-//const API_BASE = 'http://192.168.1.33:3000/api/pharma';
-//const PATIENTS_API_BASE = 'http://192.168.1.33:3000/api/patients';
-//const API_BASE = 'https://unsimplified-gwendolyn-reasonable.ngrok-free.dev/api/pharma';
-//const PATIENTS_API_BASE = 'https://unsimplified-gwendolyn-reasonable.ngrok-free.dev/api/patients';
 export async function searchPatients(query: string): Promise<Patient[]> {
   if (query.length < 2) return [];
   
   try {
-    const response = await fetch(`${PATIENTS_API_BASE}/search?q=${encodeURIComponent(query)}`,{headers: {'ngrok-skip-browser-warning': 'true'}});
+    const response = await fetch(
+      `${getUrl('patientSearch')}?q=${encodeURIComponent(query)}`,
+      { headers: config.headers }
+    );
     if (!response.ok) {
       throw new Error('Patient search failed');
     }
@@ -26,8 +24,8 @@ export async function searchProducts(query: string, locationId: number): Promise
   
   try {
     const response = await fetch(
-      `${API_BASE}/search?q=${encodeURIComponent(query)}&locationId=${locationId}`,
-      { headers: { 'ngrok-skip-browser-warning': 'true' } }
+      `${getUrl('pharmaSearch')}?q=${encodeURIComponent(query)}&locationId=${locationId}`,
+      { headers: config.headers }
     );
     if (!response.ok) {
       throw new Error('Search failed');
@@ -59,16 +57,20 @@ export async function processBill(payload: {
     Batch: string;
     ExpiryDate: string;
   }[];
+  payments?: {
+    cash: number;
+    upi: number;
+  };
   totalItems: number;
   totalAmount: number;
   billedAt: string;
 }): Promise<{ success: boolean; message?: string }> {
   try {
-    const response = await fetch(`${API_BASE}/billed`, {
+    const response = await fetch(getUrl('pharmaBill'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
+        ...config.headers,
       },
       body: JSON.stringify(payload),
     });
@@ -81,5 +83,33 @@ export async function processBill(payload: {
   } catch (error) {
     console.error('Billing error:', error);
     throw error;
+  }
+}
+
+// Upload prescription images after successful billing
+export async function uploadPrescription(
+  patientName: string,
+  patientId: number,
+  mobile: string,
+  images: File[]
+): Promise<void> {
+  const formData = new FormData();
+  formData.append('patientName', patientName);
+  formData.append('patientId', patientId.toString());
+  formData.append('mobile', mobile);
+  images.forEach((img) => formData.append('images', img));
+
+  try {
+    const response = await fetch(getUrl('prescriptions'), {
+      method: 'POST',
+      headers: config.headers,
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new Error('Prescription upload failed');
+    }
+  } catch (error) {
+    console.error('Prescription upload error:', error);
+    throw error; // Caller handles gracefully
   }
 }
