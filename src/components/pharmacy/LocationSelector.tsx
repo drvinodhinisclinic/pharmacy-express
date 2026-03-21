@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MapPin, Loader2, AlertCircle } from 'lucide-react';
+import config, { getUrl } from '@/config/api';
 import {
   Select,
   SelectContent,
