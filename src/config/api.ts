@@ -1,8 +1,9 @@
 // Centralized API configuration
-// Update baseUrl to point to your API server
+// All base URLs and dynamic endpoints are driven by environment variables.
+// Update values in .env (prefixed with VITE_) — no hardcoding needed.
 
 const config = {
-  baseUrl: 'https://192.168.0.104:3000',
+  baseUrl: import.meta.env.VITE_API_BASE_URL || 'https://192.168.0.104:3000',
   endpoints: {
     pharmaSearch: '/api/pharma/search',
     pharmaBill: '/api/pharma/billed',
