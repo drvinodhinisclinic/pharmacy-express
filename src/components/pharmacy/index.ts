@@ -11,4 +11,4 @@ export { PaymentsSection } from './PaymentsSection';
 export { PrescriptionUpload } from './PrescriptionUpload';
 export type { Location } from './LocationSelector';
 export type { Doctor } from './DoctorSelector';
-export type { PaymentDetails } from './PaymentsSection';
+export type { PaymentDetails, UpiDetails } from './PaymentsSection';
