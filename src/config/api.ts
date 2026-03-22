@@ -10,6 +10,7 @@ const config = {
     locations: '/api/productmgmt/locations',
     doctors: '/api/doctors',
     prescriptions: '/prescriptions',
+    recordedByUsers: import.meta.env.VITE_RECORDED_BY_API || '/api/config/recorded-by-users',
   },
   headers: {
     'ngrok-skip-browser-warning': 'true',
