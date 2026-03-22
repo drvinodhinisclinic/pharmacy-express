@@ -272,6 +272,7 @@ function Index() {
         payments: {
           cash: payment.cash,
           upi: payment.upi,
+          ...(payment.upiDetails && { upiDetails: payment.upiDetails }),
         },
         totalItems,
         totalAmount,

@@ -60,6 +60,12 @@ export async function processBill(payload: {
   payments?: {
     cash: number;
     upi: number;
+    upiDetails?: {
+      utr: string;
+      payerMobile: string;
+      recordedById: string;
+      recordedByName: string;
+    };
   };
   totalItems: number;
   totalAmount: number;
