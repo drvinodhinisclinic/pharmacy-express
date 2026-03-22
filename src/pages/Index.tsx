@@ -11,7 +11,7 @@ import {
   PaymentsSection,
   PrescriptionUpload,
 } from '@/components/pharmacy';
-import type { Location, Doctor, PaymentDetails } from '@/components/pharmacy';
+import type { Location, Doctor, PaymentDetails, UpiDetails } from '@/components/pharmacy';
 import { useDebounce, useClickOutside } from '@/hooks/useDebounce';
 import { searchProducts, processBill, uploadPrescription } from '@/services/pharmacyApi';
 import { Product, CartItem, Patient } from '@/types/pharmacy';
